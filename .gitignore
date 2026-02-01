@@ -1,0 +1,28 @@
+# Build outputs
+*.a26
+*.bin
+*.lst
+*.sym
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+.claude/
+*.swp
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak

@@ -8,4 +8,6 @@
 
 ## Instruction Timing (6507)
 
+## Illegal Opcodes (SAX, LAX, DCP)
+
 ## Glossary of Atari 2600 Terms

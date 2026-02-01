@@ -81,7 +81,7 @@ python scripts/create_project.py my-game
 
 Creates:
 - src/main.asm with working template
-- include/vcs.h and macro.h
+- include/vcs.h, macro.h, tia_constants.h and tv_modes.h
 - build/ directory for outputs
 
 ## Hardware Reference

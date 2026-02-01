@@ -1,6 +1,6 @@
 # Complete Examples
 
-## Rainbow Screen Example
+## Scrolling Rainbow Screen Example
 
 ```
 ;===============================================================================

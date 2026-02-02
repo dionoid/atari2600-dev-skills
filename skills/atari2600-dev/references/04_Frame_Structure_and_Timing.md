@@ -17,10 +17,10 @@ Next you typically jump into a perpetual game loop containing the vertical blank
 When the electron beam reaches the bottom of the screen, it returns to the top.  During this retrace the TIA does not display graphics; this period is called **vertical blank**.  In NTSC the standard frame allocates **37 lines** of VBLANK after the three lines of vertical sync; PAL uses **48 lines**.  Developers control VBLANK by writing to the `VBLANK` register:
 
 ```asm
-    lda #(ENABLE_LATCHES | START_VBLANK)
+    lda #%01000010
     sta VBLANK     ; blank the screen and disable player/missile graphics
     ; ...perform game logic here...
-    lda #STOP_VBLANK
+    lda #0
     sta VBLANK     ; end blanking before entering the visible kernel
 ```
 
@@ -77,7 +77,7 @@ VerticalBlank:
     TIMER_SETUP #37         ; wait 37 VBLANK lines
     VERTICAL_SYNC
     TIMER_WAIT
-    lda #STOP_VBLANK
+    lda #0
     sta VBLANK
 
 DisplayKernel:
@@ -91,7 +91,7 @@ DisplayKernel:
     bne .kernel_loop
 
 Overscan:
-    lda #(ENABLE_LATCHES | START_VBLANK)
+    lda #%01000010
     sta VBLANK
     TIMER_SETUP #30
     ; read controls or play sound here

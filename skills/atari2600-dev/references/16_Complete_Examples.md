@@ -13,7 +13,6 @@ The following program displays a vertical rainbow that scrolls through all 128 N
     processor 6502
     include "../include/vcs.h"
     include "../include/macro.h"
-    include "../include/tia_constants.h"
     include "../include/tv_modes.h"
 
     TV_MODE = NTSC
@@ -36,7 +35,7 @@ VerticalBlank:
     VERTICAL_SYNC     ; hold VSYNC for 3 scanlines
     ; game logic could go here
     TIMER_WAIT        ; wait for end of VBLANK
-    lda #STOP_VBLANK
+    lda #0
     sta VBLANK
 DisplayKernel:
     ldx FrameCounter
@@ -48,7 +47,7 @@ DisplayKernel:
     dey
     bne .kernel_loop
 Overscan:
-    lda #(ENABLE_LATCHES | START_VBLANK)
+    lda #%01000010
     sta VBLANK        ; blank screen during overscan
     TIMER_SETUP OVERSCAN_LINES
     ; handle input or sound here
@@ -70,7 +69,6 @@ This example draws a single 8‑pixel sprite (a player ship) and moves it left o
     processor 6502
     include "../include/vcs.h"
     include "../include/macro.h"
-    include "../include/tia_constants.h"
     include "../include/tv_modes.h"
 
     SEG.U Variables
@@ -104,7 +102,7 @@ MainLoop:
     inc PlayerX
 .noMove:
     TIMER_WAIT
-    lda #STOP_VBLANK
+    lda #0
     sta VBLANK
     ; Kernel – draw sprite on 10 scanlines
     ldy #10
@@ -124,7 +122,7 @@ MainLoop:
     dey
     bpl .draw_loop
     ; overscan
-    lda #(ENABLE_LATCHES | START_VBLANK)
+    lda #%01000010
     sta VBLANK
     TIMER_SETUP OVERSCAN_LINES
     TIMER_WAIT

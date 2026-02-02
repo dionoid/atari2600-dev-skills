@@ -105,7 +105,6 @@ your-game/
 ├── include/
 │   ├── vcs.h             # TIA/RIOT register definitions
 │   ├── macro.h           # Helpful macros (CLEAN_START, VERTICAL_SYNC, etc.)
-│   ├── tia_constants.h   # TIA constants and bit definitions
 │   └── tv_modes.h        # NTSC/PAL timing constants
 └── build/                # Output directory
     ├── game.a26          # ROM file

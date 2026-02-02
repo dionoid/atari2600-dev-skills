@@ -81,7 +81,7 @@ python scripts/create_project.py my-game
 
 Creates:
 - src/main.asm with working template
-- include/vcs.h, macro.h, tia_constants.h and tv_modes.h
+- include/vcs.h, macro.h and tv_modes.h
 - build/ directory for outputs
 
 ## Hardware Reference
@@ -215,7 +215,7 @@ Key RIOT registers:
 
 Always generate complete, working .asm files that:
 - Start with `processor 6502`
-- Include vcs.h, macro.h, tia_constants.h and tv_modes.h
+- Include vcs.h, macro.h and tv_modes.h
 - Define variables at $80
 - Implement full frame structure (VSYNC, VBLANK, kernel, overscan)
 - Include interrupt vectors at $FFFC

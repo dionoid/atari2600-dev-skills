@@ -24,7 +24,6 @@ MAIN_ASM = """
     processor 6502
     include "../include/vcs.h"
     include "../include/macro.h"
-    include "../include/tia_constants.h"
     include "../include/tv_modes.h"
 
 TV_MODE = NTSC
@@ -73,7 +72,7 @@ MainLoop:
 
     TIMER_WAIT
     
-    lda #STOP_VBLANK
+    lda #%00000000
     sta VBLANK ; Turn off VBLANK
 
 ;---------------------------------------
@@ -93,7 +92,7 @@ MainLoop:
 ;---------------------------------------
 ; Overscan
 ;---------------------------------------
-    lda #(ENABLE_LATCHES | START_VBLANK)
+    lda #%01000010
     sta VBLANK          ; Turn on VBLANK
 
     TIMER_SETUP OVERSCAN_LINES
@@ -136,7 +135,6 @@ def create_project(project_name):
         # Copy include files from assets
         shutil.copy(assets_dir / "vcs.h", project_path / "include" / "vcs.h")
         shutil.copy(assets_dir / "macro.h", project_path / "include" / "macro.h")
-        shutil.copy(assets_dir / "tia_constants.h", project_path / "include" / "tia_constants.h")
         shutil.copy(assets_dir / "tv_modes.h", project_path / "include" / "tv_modes.h")
         
         # Create main.asm file

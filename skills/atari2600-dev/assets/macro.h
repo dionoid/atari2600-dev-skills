@@ -36,14 +36,7 @@ VERSION_MACRO         = 111
 ; 1.02  14/JUN/2003     - VERTICAL_SYNC macro added
 ;                         (standardised macro for vertical synch code)
 ; 1.01  22/MAR/2003     - SLEEP macro added. 
-;                       - NO_ILLEGAL_OPCODES switch implemented
 ; 1.0	22/MAR/2003		Initial release
-
-; Note: Some of these macros use illegal opcodes.  To disable illegal opcode usage, 
-;   define the symbol NO_ILLEGAL_OPCODES (-DNO_ILLEGAL_OPCODES=1 on command-line).
-;   If you do not allow illegal opcode usage, you must include this file 
-;   *after* including VCS.H (as the non-illegal opcodes access hardware
-;   registers and require them to be defined first).
 
 ; Available macros...
 ;   SLEEP n             - sleep for n cycles
@@ -75,11 +68,7 @@ VERSION_MACRO         = 111
                 ENDIF
 
                 IF .CYCLES & 1
-                    IFNCONST NO_ILLEGAL_OPCODES
-                        nop VSYNC
-                    ELSE
-                        bit VSYNC
-                    ENDIF
+                    nop VSYNC
 .CYCLES             SET .CYCLES - 3
                 ENDIF
             
@@ -116,13 +105,7 @@ VERSION_MACRO         = 111
             MAC CLEAN_START
                 sei
                 cld
-            
-                IFNCONST NO_ILLEGAL_OPCODES
-                    lxa #0
-                ELSE
-                    ldx #0
-                    txa
-                ENDIF
+                lxa #0
                 tay
 .CLEAR_STACK    dex
                 txs

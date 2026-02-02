@@ -91,13 +91,14 @@ Automatically:
 
 **scripts/create_project.py**: Generate new project structure
 ```bash
+# Run from your workspace root directory
 python scripts/create_project.py my-game
 ```
 
-Creates:
-- src/main.asm with working template
-- include/vcs.h, macro.h and tv_modes.h
-- build/ directory for outputs
+Creates a new project folder in your current directory:
+- my-game/src/main.asm with working template
+- my-game/include/vcs.h, macro.h and tv_modes.h
+- my-game/build/ directory for outputs
 
 ## Hardware Reference
 
@@ -153,13 +154,14 @@ Key RIOT registers:
 
 ### Starting from Scratch
 
-1. Create project: `python scripts/create_project.py game-name`
-2. Edit src/main.asm:
+1. Create project from your workspace root: `python scripts/create_project.py game-name`
+   - This creates a new `game-name/` folder in your current directory
+2. Edit game-name/src/main.asm:
    - Define variables at $80
    - Implement game logic in VBLANK
    - Create display kernel for visible screen
    - Handle input, collisions, scoring
-3. Build and test: `python scripts/build_and_run.py src/main.asm`
+3. Build and test: `python scripts/build_and_run.py game-name/src/main.asm`
 4. Iterate: Modify code, rebuild, test
 
 ### Modifying Existing Code

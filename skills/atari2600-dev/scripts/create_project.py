@@ -5,13 +5,17 @@ Create a new Atari 2600 project with proper structure and includes.
 Usage:
     python create_project.py <project-name>
 
+IMPORTANT: Run this script from your workspace root directory.
+The project will be created in the current directory.
+
 Creates:
     project-name/
     ├── src/
     │   └── main.asm          # Main source file
     ├── include/
     │   ├── vcs.h             # TIA/RIOT register definitions
-    │   └── macro.h           # Helpful macros
+    │   ├── macro.h           # Helpful macros
+    │   └── tv_modes.h        # TV mode constants
     └── build/                # Output directory for ROMs
 """
 

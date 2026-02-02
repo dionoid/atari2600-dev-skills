@@ -35,17 +35,28 @@ MainLoop:
     ; 1. Vertical Sync (3 scanlines)
     VERTICAL_SYNC
 
-    ; 2. Vertical Blank (37 scanlines) - game logic time
-    ; Pre-calculate colors, positions, lookup tables here
-    ; You have ~2,800 cycles for complex calculations
+    ; 2. Vertical Blank (37 scanlines) - ALL game logic happens here
+    ; ~2,800 cycles available for:
+    ;   - Reading joystick input (SWCHA)
+    ;   - Updating positions (playerX += velocity)
+    ;   - Collision detection (check overlap)
+    ;   - Score updates (sed; adc #1; cld)
+    ;   - Sprite positioning (SetHorizPos)
+    ;   - Pre-calculating colors, graphics pointers
+    ;   - Building lookup tables
+    ; EVERYTHING except drawing must happen here or in overscan!
 
-    ; 3. Visible Screen (192 scanlines) - display kernel
-    ; CRITICAL: Each loop iteration must be EXACTLY 1 scanline
-    ; Keep kernel simple - max 76 cycles per scanline
-    ; Update TIA registers for graphics each scanline
+    ; 3. Visible Screen (192 scanlines) - ONLY DRAWING
+    ; CRITICAL: Each loop iteration must be EXACTLY 1 scanline (76 cycles max)
+    ; ONLY allowed operations:
+    ;   - sta GRP0/GRP1 (draw sprites)
+    ;   - sta PF0/PF1/PF2 (draw playfield)
+    ;   - sta COLUP0/COLUP1/COLUBK (set colors from pre-calculated values)
+    ;   - Simple scanline counter (inc/cmp/bne)
+    ; NEVER: collision checks, input reading, calculations, branches with logic
 
     ; 4. Overscan (30 scanlines) - more game logic time
-    ; Additional time for calculations
+    ; Additional time for calculations, sound updates, etc.
 
     jmp MainLoop
 ```
@@ -53,8 +64,12 @@ MainLoop:
 **Code Quality Standards:**
 - **CRITICAL**: Use WSYNC to synchronize with scanlines
 - **CRITICAL**: Keep visible kernel under 76 cycles/scanline - if doing complex calculations, each loop iteration may span multiple scanlines, breaking timing
-- Pre-calculate data during VBLANK, not during visible screen
-- Use lookup tables for complex math in kernels
+- **CRITICAL**: The visible kernel must ONLY draw graphics - NO game logic allowed!
+  - ❌ NEVER do in kernel: collision detection, input checking, score updates, position calculations
+  - ✅ ONLY in kernel: read pre-calculated values, update GRP0/GRP1/PF registers, simple scanline counters
+  - Move ALL game logic (collision, input, movement, scoring) to VBLANK or Overscan sections
+- Pre-calculate all data during VBLANK (colors, positions, graphics pointers)
+- Use lookup tables for complex math - build them in VBLANK, read them in kernel
 - Clear TIA registers at startup
 - Include comments explaining TIA interactions and cycle counts
 - Follow DASM syntax (labels with `:`, `.` for local labels)
@@ -203,7 +218,9 @@ Key RIOT registers:
 
 ## Common Issues
 
-**Wrong total scanlines (not 262 for NTSC):** Most common cause is kernel doing too much work per iteration. If each loop iteration takes >76 cycles, it spans multiple scanlines. Solution: Pre-calculate data during VBLANK and use lookup tables in kernel. Check .lst file for cycle counts.
+**Game logic in visible kernel (MOST COMMON MISTAKE):** Adding collision detection, input checking, score updates, or any game logic inside the kernel loop will exceed 76 cycles per scanline, causing extra scanlines and breaking the 262 scanline frame timing. Symptoms: wrong scanline count, graphics glitches, timing issues. Solution: Move ALL game logic to VBLANK or Overscan. The kernel should ONLY update graphics registers (GRP0/1, PF0/1/2, COLUP0/1, etc.) using pre-calculated values.
+
+**Wrong total scanlines (not 262 for NTSC):** Most common cause is kernel doing too much work per iteration. If each loop iteration takes >76 cycles, it spans multiple scanlines. Solution: Pre-calculate data during VBLANK and use lookup tables in kernel. Check .lst file for cycle counts. Also ensure sprite positioning (SetHorizPos) happens during VBLANK, not after - each positioning call uses scanlines.
 
 **Graphics flickering:** Timing issue in kernel, missing WSYNC, or too many cycles per scanline
 

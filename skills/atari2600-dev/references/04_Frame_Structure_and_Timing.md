@@ -63,6 +63,30 @@ To achieve a stable picture, your kernel must output exactly the same number of 
 
 You can verify stability by counting scanlines in Stella (Ctrl‑G).  A drifting picture indicates that your kernel is too short or too long; adjust timing loops or add `NOP` instructions to pad cycles.
 
+### CRITICAL: What Goes in Each Section
+
+**VBLANK (37 scanlines) - ALL GAME LOGIC:**
+- Input reading (joystick, fire buttons)
+- Position updates (velocity, movement)
+- Collision detection
+- Score calculations
+- Sprite positioning (SetHorizPos calls)
+- Pre-calculating colors, graphics pointers
+- Any math, branching logic, or complex calculations
+
+**Visible Kernel (192 scanlines) - ONLY GRAPHICS:**
+- Reading pre-calculated values
+- Updating TIA graphics registers (GRP0/1, PF0/1/2, COLUP0/1, COLUBK)
+- Simple scanline counter (inc/dec/cmp/branch)
+- **NEVER:** collision checks, input reading, position calculations, complex branching
+
+**Overscan (30 scanlines) - MORE GAME LOGIC:**
+- Additional calculations
+- Sound effects
+- State transitions
+
+**Why this matters:** Each scanline in the visible kernel has exactly 76 CPU cycles. Adding game logic (collision detection, input handling, etc.) easily exceeds this limit, causing the kernel to take multiple scanlines per iteration. This breaks the 262-scanline frame timing and causes graphics glitches.
+
 ## A Simple Rainbow ROM (Timing Demo)
 
 A classic timing demonstration is the *rainbow* program that changes the background colour every scanline.  The kernel increments a frame counter and uses it to select a colour:

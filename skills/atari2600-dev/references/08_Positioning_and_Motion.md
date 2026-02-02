@@ -4,7 +4,7 @@ Because the Atari 2600 lacks built‑in X and Y coordinates, positioning object
 
 ## Horizontal Positioning Basics
 
-Each sprite’s horizontal position is tracked by an internal counter that wraps every 160 visible pixels.  To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears some pixels later because the TIA’s counters are offset.
+Each sprite’s horizontal position is tracked by an internal counter that wraps every 160 visible pixels. So each object can have a horitontal position from 0 to 159. To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears some pixels later because the TIA’s counters are offset.
 
 To change the horizontal position each frame, write to the appropriate `RESx` during the vertical blank or overscan so you don’t disturb the kernel.
 
@@ -23,8 +23,13 @@ Use coarse positioning (`RESPx`) for large movements (e.g., when repositioning a
 
 ```asm
 ; SetHorizPos routine
-; A = X coordinate
-; RESP0+X = register to strobe for coarse positioning
+; X register contains the object you want to position:
+;   0 for P0
+;   1 for P1
+;   2 for M0
+;   3 for M1
+;   4 for BL
+; A registed contains the X coordinate
 SetHorizPos SUBROUTINE
             cpx #2 ; carry flag will be set for balls and missiles
             adc #0 ; (adding 1 to account for different timings)
@@ -47,8 +52,6 @@ Note that *before* calling the SetHorizPos subroutine for the set of objects you
             sta WSYNC
             sta HMOVE ; apply horizontal fine position offset
 ```
-
-Because HMOVE only shifts left, you must calculate the two’s complement of rightward motion (e.g., to move right by 3 pixels write value `-3 & $0F` to `HMPx`).
 
 ## Vertical Positioning
 

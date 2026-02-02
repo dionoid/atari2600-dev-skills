@@ -22,10 +22,10 @@ from pathlib import Path
 
 MAIN_ASM = """    
     processor 6502
-    include "include/vcs.h"
-    include "include/macro.h"
-    include "include/tia_constants.h"
-    include "include/tv_modes.h"
+    include "../include/vcs.h"
+    include "../include/macro.h"
+    include "../include/tia_constants.h"
+    include "../include/tv_modes.h"
 
 TV_MODE = NTSC
 

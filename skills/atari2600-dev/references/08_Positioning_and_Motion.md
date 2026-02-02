@@ -22,18 +22,33 @@ After an HMOVE, you should wait at least **24 CPU cycles** before writing to mot
 
 ## Fine vs Coarse Movement
 
-Use coarse positioning (`RESPx`) for large movements (e.g., when repositioning a sprite after it leaves the screen) and fine positioning (`HMOVE`) for per‑frame movement (1–8 pixels).  A typical movement routine:
+Use coarse positioning (`RESPx`) for large movements (e.g., when repositioning a sprite after it leaves the screen) and fine positioning (`HMOVE`) for per‑frame movement (1–8 pixels).  A typical horizontal movement routine:
 
 ```asm
-    lda NewX       ; 0–159
-    sta TempX
-    sec            ; adjust for RESP offset
-    sbc #37
-    sta HMP0       ; low nibble is fine adjustment
-    and #%11110000
-    asl            ; shift left nibble into high nibble
-    sta RESP0      ; coarse reset
-    sta HMOVE      ; apply fine movement
+; SetHorizPos routine
+; A = X coordinate
+; RESP0+X = register to strobe for coarse positioning
+SetHorizPos SUBROUTINE
+            cpx #2 ; carry flag will be set for balls and missiles
+            adc #0 ; (adding 1 to account for different timings)
+            sec
+            sta WSYNC
+.loop       sbc #15
+            bcs .loop
+            eor #7
+            asl
+            asl
+            asl
+            asl
+            sta.a HMP0,X  ; force absolute addressing for timing!
+            sta RESP0,X
+            rts
+```
+
+Note that *before* calling the SetHorizPos subroutine for the set of objects you want to position horizontally, you must (once) do `sta HMCLR` to reset any old horizontal fine position offsets. And after calling the SetHorizPos subroutine for the objects, you must (once) do: 
+```asm
+            sta WSYNC
+            sta HMOVE ; apply horizontal fine position offset
 ```
 
 Because HMOVE only shifts left, you must calculate the two’s complement of rightward motion (e.g., to move right by 3 pixels write value `-3 & $0F` to `HMPx`).

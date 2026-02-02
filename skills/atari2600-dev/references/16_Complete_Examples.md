@@ -11,10 +11,10 @@ The following program displays a vertical rainbow that scrolls through all 128 N
 ; Scrolling Rainbow - basic example ROM for the Atari 2600
 ;===============================================================================
     processor 6502
-    include "include/vcs.h"
-    include "include/macro.h"
-    include "include/tia_constants.h"
-    include "include/tv_modes.h"
+    include "../include/vcs.h"
+    include "../include/macro.h"
+    include "../include/tia_constants.h"
+    include "../include/tv_modes.h"
 
     TV_MODE = NTSC
 
@@ -68,8 +68,10 @@ This example draws a single 8‑pixel sprite (a player ship) and moves it left o
 
 ```asm
     processor 6502
-    include "include/vcs.h"
-    include "include/macro.h"
+    include "../include/vcs.h"
+    include "../include/macro.h"
+    include "../include/tia_constants.h"
+    include "../include/tv_modes.h"
 
     SEG.U Variables
     ORG $80

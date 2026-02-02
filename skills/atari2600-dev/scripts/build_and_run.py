@@ -41,7 +41,12 @@ def build_and_run(source_file, output_file=None):
 
     # Determine output filename
     if output_file is None:
-        output_file = source_path.with_suffix('.a26')
+        # Output to build/ directory if it exists, otherwise same as source
+        build_dir = source_path.parent.parent / 'build'
+        if build_dir.exists():
+            output_file = build_dir / source_path.with_suffix('.a26').name
+        else:
+            output_file = source_path.with_suffix('.a26')
     else:
         output_file = Path(output_file).resolve()
 

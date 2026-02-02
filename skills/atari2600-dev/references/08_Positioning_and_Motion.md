@@ -4,10 +4,7 @@ Because the Atari 2600 lacks built‑in X and Y coordinates, positioning object
 
 ## Horizontal Positioning Basics
 
-Each sprite’s horizontal position is tracked by an internal 9‑bit counter that wraps every 160 visible pixels.  To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears some pixels later because the TIA’s counters are offset:
-
-* Writing to `RESP0` positions player 0 37 colour clocks (11 CPU cycles) to the right of the beam; `RESP1` positions player 1 39 clocks to the right.
-* Missile and ball reset registers align them relative to their players or to the beam.
+Each sprite’s horizontal position is tracked by an internal counter that wraps every 160 visible pixels.  To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears some pixels later because the TIA’s counters are offset.
 
 To change the horizontal position each frame, write to the appropriate `RESx` during the vertical blank or overscan so you don’t disturb the kernel.
 

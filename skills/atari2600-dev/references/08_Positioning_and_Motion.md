@@ -4,7 +4,7 @@ Because the Atari 2600 lacks built‑in X and Y coordinates, positioning object
 
 ## Horizontal Positioning Basics
 
-Each sprite’s horizontal position is tracked by an internal counter that wraps every 160 visible pixels. So each object can have a horitontal position from 0 to 159. To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears some pixels later because the TIA’s counters are offset.
+Each sprite’s horizontal position is tracked by an internal counter that wraps every 160 visible pixels. So each object can have a horitontal position from 0 to 159. To move a sprite, you **reset** its counter to the current beam position using `RESP0`, `RESP1`, `RESM0`, `RESM1` or `RESBL`.  The object appears on the next scanline some pixels later because the TIA’s counters are offset.
 
 To change the horizontal position each frame, write to the appropriate `RESx` during the vertical blank or overscan so you don’t disturb the kernel.
 
@@ -12,24 +12,35 @@ To change the horizontal position each frame, write to the appropriate `RESx` du
 
 While coarse positioning resets the counter, **fine positioning** uses the horizontal motion registers:
 
-* `HMP0`, `HMP1`, `HMM0`, `HMM1`, `HMBL` – 4‑bit registers containing values from `0000` to `1111`, representing a shift of 0–15 pixels to the left.
+* `HMP0`, `HMP1`, `HMM0`, `HMM1`, `HMBL` – upper 4‑bit registers containing values from `0000` to `1111`, representing:
+  * 0000xxxx - no motion
+  * 0001xxxx - 1 pixel to the left
+  * 0010xxxx - 2 pixels to the left
+  * 0011xxxx - 3 pixels to the left
+  * 0100xxxx - 4 pixels to the left
+  * 0101xxxx - 5 pixels to the left
+  * 0110xxxx - 6 pixels to the left
+  * 0111xxxx - 7 pixels to the left
+  * 1000xxxx - 8 pixels to the right
+  * 1001xxxx - 7 pixels to the right
+  * 1010xxxx - 6 pixels to the right
+  * 1011xxxx - 5 pixels to the right
+  * 1100xxxx - 4 pixels to the right
+  * 1101xxxx - 3 pixels to the right
+  * 1110xxxx - 2 pixels to the right
+  * 1111xxxx - 1 pixel to the right
 * `HMOVE` – When written, the TIA reads the `HMPx` values and injects extra clock pulses into the position counters, shifting objects left by the specified number of pixels.
 
 After an HMOVE, you should wait at least **24 CPU cycles** before writing to motion registers again; modifying them too soon can create the infamous **HMOVE bar** – a comb‑like artifact at the left edge of the screen.
 
 ## Fine vs Coarse Movement
 
-Use coarse positioning (`RESPx`) for large movements (e.g., when repositioning a sprite after it leaves the screen) and fine positioning (`HMOVE`) for per‑frame movement (1–8 pixels).  A typical horizontal movement routine:
+Use coarse positioning (`RESPx`) to position the object close to the desired horizontal location and fine positioning (`HMOVE`) to get the object to the exact location.  A typical horizontal movement routine:
 
 ```asm
 ; SetHorizPos routine
-; X register contains the object you want to position:
-;   0 for P0
-;   1 for P1
-;   2 for M0
-;   3 for M1
-;   4 for BL
-; A registed contains the X coordinate
+; A = desired X position (0-159)
+; X = object to position (0=P0, 1=P1, 3=M0, 4=M1, 5=BL)
 SetHorizPos SUBROUTINE
             cpx #2 ; carry flag will be set for balls and missiles
             adc #0 ; (adding 1 to account for different timings)

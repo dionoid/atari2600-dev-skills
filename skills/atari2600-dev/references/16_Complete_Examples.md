@@ -13,8 +13,8 @@ The following program displays a vertical rainbow that scrolls through all 128 N
     processor 6502
     include "include/vcs.h"
     include "include/macro.h"
-    include "include/tv_modes.h"
     include "include/tia_constants.h"
+    include "include/tv_modes.h"
 
     TV_MODE = NTSC
 

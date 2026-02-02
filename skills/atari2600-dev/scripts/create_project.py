@@ -24,8 +24,8 @@ MAIN_ASM = """
     processor 6502
     include "include/vcs.h"
     include "include/macro.h"
-    include "include/tv_modes.h"
     include "include/tia_constants.h"
+    include "include/tv_modes.h"
 
 TV_MODE = NTSC
 
@@ -136,9 +136,9 @@ def create_project(project_name):
         # Copy include files from assets
         shutil.copy(assets_dir / "vcs.h", project_path / "include" / "vcs.h")
         shutil.copy(assets_dir / "macro.h", project_path / "include" / "macro.h")
-        shutil.copy(assets_dir / "tv_modes.h", project_path / "include" / "tv_modes.h")
         shutil.copy(assets_dir / "tia_constants.h", project_path / "include" / "tia_constants.h")
-
+        shutil.copy(assets_dir / "tv_modes.h", project_path / "include" / "tv_modes.h")
+        
         # Create main.asm file
         (project_path / "src" / "main.asm").write_text(MAIN_ASM)
 

@@ -13,8 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Build automation scripts:
   - `build_and_run.py` - Compile with dasm and launch in Stella
   - `create_project.py` - Generate new project structure
-- Comprehensive reference documentation:
-  - T.B.D.
+- Comprehensive reference documentation.
 
 ### Technical Details
 - Ensures proper frame structure (3 + 37 + 192 + 30 scanlines)

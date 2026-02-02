@@ -77,7 +77,7 @@ cp -r atari2600-dev-skills/skills/atari2600-dev ~/.claude/skills/
 After installation, the skill automatically activates when you mention Atari 2600 development:
 
 ```
-> Create a simple Atari 2600 game with a bouncing ball
+> Create a simple Atari 2600 game with a spaceship which has to avoid asteroids
 ```
 
 ```

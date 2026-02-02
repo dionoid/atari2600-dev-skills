@@ -88,7 +88,23 @@ Creates:
 
 **When to consult references:** Load these files when you need detailed information:
 
-TODO
+- [01_Atari_2600_Fundamentals.md](references/01_Atari_2600_Fundamentals.md) - Architecture overview, 6507 CPU, TIA/RIOT basics, NTSC vs PAL timing
+- [02_Memory_and_Hardware_Maps.md](references/02_Memory_and_Hardware_Maps.md) - Complete memory map, TIA/RIOT register addresses, zero-page conventions
+- [03_Toolchain_and_Development_Setup.md](references/03_Toolchain_and_Development_Setup.md) - dasm assembler usage, project layout, Stella debugger, macros
+- [04_Frame_Structure_and_Timing.md](references/04_Frame_Structure_and_Timing.md) - Frame sections (VSYNC/VBLANK/kernel/overscan), cycle counting, timing
+- [05_Graphics_Basics.md](references/05_Graphics_Basics.md) - Color system, luminance values, basic TIA graphics concepts
+- [06_Playfield_Graphics.md](references/06_Playfield_Graphics.md) - PF0/PF1/PF2 registers, reflection, score mode, asymmetric playfields
+- [07_Players_Missiles_and_Ball.md](references/07_Players_Missiles_and_Ball.md) - Sprite objects (P0/P1/M0/M1/BL), NUSIZ, graphics registers
+- [08_Positioning_and_Motion.md](references/08_Positioning_and_Motion.md) - RESP0/1, horizontal motion (HMP0/1, HMOVE), fine positioning
+- [09_Input_Handling.md](references/09_Input_Handling.md) - Reading joysticks (SWCHA), fire buttons (INPT4/5), console switches
+- [10_Collision_Detection.md](references/10_Collision_Detection.md) - Collision registers (CXM0P, CXP0FB, etc.), CXCLR, collision patterns
+- [11_Sound_and_Music.md](references/11_Sound_and_Music.md) - Audio channels, AUDC/AUDF/AUDV registers, waveforms, music patterns
+- [12_Timers_and_Game_Logic.md](references/12_Timers_and_Game_Logic.md) - RIOT timer (TIM64T), INTIM, game state management
+- [13_Advanced_Graphics_Techniques.md](references/13_Advanced_Graphics_Techniques.md) - Multi-sprite kernels, flicker, 2-line kernels, 6-digit scores
+- [14_Cartridge_and_ROM_Techniques.md](references/14_Cartridge_and_ROM_Techniques.md) - Bank switching (F8/F6/F4), ROM layout, cartridge formats
+- [15_Common_Patterns_and_Gotchas.md](references/15_Common_Patterns_and_Gotchas.md) - Best practices, common mistakes, optimization tips
+- [16_Complete_Examples.md](references/16_Complete_Examples.md) - Full working code samples demonstrating various techniques
+- [17_Reference_and_Cheat_Sheets.md](references/17_Reference_and_Cheat_Sheets.md) - Quick reference tables for registers, cycles, and common values
 
 **Quick reference:**
 
@@ -141,23 +157,24 @@ Key RIOT registers:
 **Add sprite movement:**
 - Read joystick in VBLANK: `lda SWCHA`
 - Update position variables
-- Position sprite in kernel: See references/examples.md "Sprite Movement"
+- Position sprite with RESP0/1 and horizontal motion
+- See [08_Positioning_and_Motion.md](references/08_Positioning_and_Motion.md) for detailed positioning techniques
 
 **Add collision detection:**
 - Read collision registers: `lda CXP0FB` (player-playfield)
 - Check bit 7 for collision
 - Clear with `sta CXCLR`
-- See references/examples.md "Collision Detection"
+- See [10_Collision_Detection.md](references/10_Collision_Detection.md) for collision register details
 
 **Add sound:**
 - Set AUDC (waveform), AUDF (frequency), AUDV (volume)
 - Update each frame for effects
-- See references/examples.md "Sound Effects"
+- See [11_Sound_and_Music.md](references/11_Sound_and_Music.md) for audio channels and waveforms
 
 **Add score display:**
 - Use BCD for scoring: `sed` mode, `adc #1`
 - Display with playfield or sprites
-- See references/examples.md "Score Display"
+- See [13_Advanced_Graphics_Techniques.md](references/13_Advanced_Graphics_Techniques.md) for 6-digit score displays
 
 ## Best Practices
 

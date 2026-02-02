@@ -128,6 +128,8 @@ Key TIA registers:
 
 Key RIOT registers:
 - SWCHA ($0280): Joystick input
+  - **Left player (P0)**: Bit 7=Right, Bit 6=Left, Bit 5=Down, Bit 4=Up (0=pressed)
+  - **Right player (P1)**: Bit 3=Right, Bit 2=Left, Bit 1=Down, Bit 0=Up (0=pressed)
 - INPT4/5 ($0C/$0D): Fire buttons
 - TIM64T ($0296): 64-cycle timer (most common)
 - INTIM ($0284): Read timer
@@ -156,6 +158,8 @@ Key RIOT registers:
 
 **Add sprite movement:**
 - Read joystick in VBLANK: `lda SWCHA`
+- Check specific bits (Left Player): bit 7=Right, bit 6=Left, bit 5=Down, bit 4=Up (0=pressed)
+- Example: `lda SWCHA; and #%01000000; bne .notLeft` (checks left movement)
 - Update position variables
 - Position sprite with RESP0/1 and horizontal motion
 - See [08_Positioning_and_Motion.md](references/08_Positioning_and_Motion.md) for detailed positioning techniques

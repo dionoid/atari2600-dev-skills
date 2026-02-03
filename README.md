@@ -36,7 +36,7 @@ sudo pacman -S dasm stella
 
 ### Install the Skill
 
-**Option 1: Install from .skill file (Recommended)**
+**Option 1: Install from .skill file (Not yet available!)**
 
 ```bash
 # Download the latest release

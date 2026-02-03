@@ -50,7 +50,7 @@ The RIOT contains:
 
 ### Cartridge and memory map
 
-The 2600 memory map is heavily mirrored.  Addresses $0000–$003F map the 45 TIA write and 14 read registers; this 64‑byte block is mirrored across $0040–$007F and repeatedly up to $00FF.  The RIOT RAM at $0080–$00FF is also mirrored across $0100–$01FF, but page 1 is reserved for the stack.  The RIOT I/O and timer registers live at $0280–$0297 (mirrored through $02FF).  Cartridge ROM appears from $F000–$FFFF for 4 KB games; smaller 2 KB games map at $F800–$FFFF.  Larger games use bank‑switching to swap different 4 KB banks into this range.
+The 2600 memory map is heavily mirrored.  Addresses \$0000–\$003F map the 45 TIA write and 14 read registers; this 64‑byte block is mirrored across \$0040–\$007F and repeatedly up to \$00FF.  The RIOT RAM at \$0080–\$00FF is also mirrored across \$0100–\$01FF, but page 1 is reserved for the stack.  The RIOT I/O and timer registers live at \$0280–\$0297 (mirrored through \$02FF).  Cartridge ROM appears from \$F000–\$FFFF for 4 KB games; smaller 2 KB games map at \$F800–\$FFFF.  Larger games use bank‑switching to swap different 4 KB banks into this range.
 
 ## NTSC vs PAL Timing Differences
 

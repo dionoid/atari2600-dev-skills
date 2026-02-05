@@ -1,0 +1,6 @@
+frame 100
+joy0Fire 1
+joy0Fire 0
+frame 100
+saveSnap
+exitRom

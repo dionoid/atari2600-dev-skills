@@ -1,0 +1,8 @@
+{
+  "name": "atari2600-dev-skills",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "dev"
+}

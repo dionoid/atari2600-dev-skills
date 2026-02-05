@@ -26,3 +26,5 @@ dist/
 # Temporary files
 *.tmp
 *.bak
+
+.devcontainer/personal/**

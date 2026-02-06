@@ -28,4 +28,4 @@ dist/
 *.bak
 
 .devcontainer/personal/**
-!example-roms/**
+!example-roms/*.bin

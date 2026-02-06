@@ -1,6 +1,21 @@
-frame 100
+# give the game a second to start
+frame 60
+
+# now press joystick
 joy0Fire 1
 joy0Fire 0
-frame 100
+
+# wait a second
+frame 60
+
+# pring last frame's number of scanlines
+print _scanEnd
+
+# save this session -> NOTE: ONLY WORKS IN INTERACTIVE MODE
+saveSes
+
+# save snapshot
 saveSnap
+
+# exit
 exitRom

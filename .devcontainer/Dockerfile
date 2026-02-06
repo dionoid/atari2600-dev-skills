@@ -14,7 +14,7 @@ RUN apt-get update \
     unzip \
     nano \
     sudo \
-    xvfb xauth \
+    xvfb \
     libgl1-mesa-dri libglx-mesa0 \
   && rm -rf /var/lib/apt/lists/*
 

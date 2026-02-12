@@ -41,7 +41,7 @@ No manual installation of dasm, Stella, or other dependencies is required.
 
 ## Skill Setup
 
-No setup needed, because the dev container automatically creates a symlink on first start via `postCreateCommand`:
+No registration/setup needed, because the dev container automatically creates a symlink on first start via `postCreateCommand`:
 
 ```
 .claude/skills/atari2600-dev -> ../../skills/atari2600-dev
@@ -94,9 +94,14 @@ The skill includes automation scripts:
 ```bash
 python3 skills/atari2600-dev/scripts/build_and_run.py src/main.asm
 ```
-- Assembles with dasm
-- Runs the ROM in headless Stella (via `xvfb-run`) with a debug script
-- Validates scanline count (expects 262 for NTSC)
+- Assembles with dasm (`-f3` format)
+- Creates or uses a debug script named `<romname>.script` in the build directory
+- Runs the ROM in headless Stella with the command:
+  ```bash
+  xvfb-run -a stella -userdir <build-dir> -debug <rom>.a26 -dbg.logexec 1
+  ```
+- **IMPORTANT:** The `-dbg.logexec 1` flag is always required for automated testing
+- Validates scanline count from `<romname>.script.output.txt` (expects 262 for NTSC)
 - Reports pass/fail with scanline count and RAM state
 
 **Create New Project:**

@@ -100,21 +100,29 @@ Stella is the standard Atari 2600 emulator and includes a built-in debugger. For
 
 ### Full Command
 
-```
+**This is the ONLY correct way to run Stella with debug scripts for automated testing:**
+
+```bash
 xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir <dir> -debug <rom>.a26 -dbg.logexec 1
 ```
 
+**IMPORTANT:**
+- Do NOT use `-exitlauncher` (this is not a valid flag when running Stella in headless mode)
+- Do NOT pipe scripts with `< script.txt` (Stella loads scripts automatically via naming convention)
+- ALWAYS use `-dbg.logexec 1` (required for capturing output to file)
+- The debug script MUST be named `<romname>.script` and placed in the `-userdir` directory
+
 ### Flags Breakdown
 
-| Part | Purpose |
-|---|---|
-| `xvfb-run -a` | Run under a virtual framebuffer; `-a` auto-selects a free display number |
-| `-s "-screen 0 1280x720x24"` | Configure virtual screen resolution and color depth |
-| `stella` | The Stella emulator binary |
-| `-userdir <dir>` | Directory where Stella looks for `<romname>.script` and writes output files |
-| `-debug` | Start Stella in debugger mode immediately |
-| `<rom>.a26` | Path to the ROM file to load |
-| `-dbg.logexec 1` | Enable script output logging -- writes debugger output to a file instead of only displaying in the UI |
+| Part | Purpose | Required |
+|---|---|---|
+| `xvfb-run -a` | Run under a virtual framebuffer; `-a` auto-selects a free display number | Yes |
+| `-s "-screen 0 1280x720x24"` | Configure virtual screen resolution and color depth | Yes |
+| `stella` | The Stella emulator binary | Yes |
+| `-userdir <dir>` | Directory where Stella looks for `<romname>.script` and writes output files | Yes |
+| `-debug` | Start Stella in debugger mode immediately | Yes |
+| `<rom>.a26` | Path to the ROM file to load | Yes |
+| `-dbg.logexec 1` | Enable script output logging -- writes debugger output to a file instead of only displaying in the UI | **ALWAYS REQUIRED** |
 
 ### How -userdir Works
 
@@ -267,7 +275,7 @@ These commands simulate joystick input. Pass `1` to press or `0` to release.
 | Command | Description |
 |---|---|
 | `saveSnap` | Save a screenshot of the current frame as a PNG file in the ROM directory |
-| `saveSes` | Log the current debugger session state to a text file |
+| `saveSes` | Log the current debugger session state to a text file (note: doesn't work in debug scripts) |
 
 ### Traps (Memory Access Watches)
 

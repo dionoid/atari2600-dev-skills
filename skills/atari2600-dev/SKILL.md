@@ -48,14 +48,25 @@ python3 <skill-base-dir>/scripts/build_and_run.py <source.asm>
 
 This script:
 1. **Assembles** with dasm (`-f3` format, generates `.lst` and `.sym` files)
-2. **Runs** the ROM in headless Stella (via `xvfb-run`) with a `.script` debug file
-3. **Validates** by reading `_scanEnd` from Stella output — expects 262 (NTSC) or 312 (PAL)
-4. **Reports** pass/fail with scanline count, RAM state, and any saved snapshots
+2. **Creates or uses** a debug script named `<romname>.script` in the build directory
+3. **Runs** the ROM in headless Stella with the command:
+   ```bash
+   xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir <build-dir> -debug <rom>.a26 -dbg.logexec 1
+   ```
+   **IMPORTANT:** The `-dbg.logexec 1` flag is ALWAYS required for automated validation
+4. **Validates** by reading `_scanEnd` from `<romname>.script.output.txt` — expects 262 (NTSC) or 312 (PAL)
+5. **Reports** pass/fail with scanline count, RAM state, and any saved snapshots
 
 Output tells you exactly what happened:
 - `Assembly OK` / `Assembly FAILED` — did dasm succeed?
 - `Scanlines: 262 (NTSC OK)` — is the frame timing correct?
 - `Build and validation PASSED` / `validation FAILED` — overall result
+
+**How Stella Debug Scripts Work:**
+- Script must be named `<romname>.script` (e.g., `main.script` for `main.a26`)
+- Script must be in the directory specified by `-userdir`
+- Stella automatically loads and executes the script when started with `-debug`
+- Output is written to `<romname>.script.output.txt` when `-dbg.logexec 1` is used
 
 ### 4. Iterate
 
@@ -93,7 +104,12 @@ python3 <skill-base-dir>/scripts/build_and_run.py my-game/src/main.asm
 
 ## Debug Scripts
 
-Stella loads `<romname>.script` from the ROM's directory. The script runs debugger commands automatically. If no `.script` file exists, `build_and_run.py` creates a default one.
+**How Debug Scripts Work:**
+- Stella automatically loads `<romname>.script` from the `-userdir` directory
+- The script runs debugger commands automatically when Stella starts with `-debug`
+- If no `.script` file exists, `build_and_run.py` creates a default one
+- **DO NOT** use `-exitlauncher` (not a valid Stella flag)
+- **DO NOT** pipe scripts with `< script.txt` (Stella uses naming convention, not stdin)
 
 ### Script Format
 

@@ -106,11 +106,14 @@ Stella is the standard Atari 2600 emulator and includes a built-in debugger. For
 xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir <dir> -debug <rom>.a26 -dbg.logexec 1
 ```
 
-**IMPORTANT:**
-- Do NOT use `-exitlauncher` (this is not a valid flag when running Stella in headless mode)
-- Do NOT pipe scripts with `< script.txt` (Stella loads scripts automatically via naming convention)
-- ALWAYS use `-dbg.logexec 1` (required for capturing output to file)
-- The debug script MUST be named `<romname>.script` and placed in the `-userdir` directory
+**CRITICAL REQUIREMENTS:**
+- **Script naming:** Debug scripts MUST be named `<romname>.script` (e.g., `main.script` for `main.a26`)
+- **Script location:** The script MUST be placed in the directory specified by `-userdir`
+- **Do NOT** use `-exitlauncher` (not a valid flag in headless mode)
+- **Do NOT** pipe scripts with `< script.txt` (Stella uses naming convention, not stdin)
+- **ALWAYS** use `-dbg.logexec 1` (required for capturing output to file)
+
+**Example:** If your ROM is `/build/main.a26` and you use `-userdir /build`, then your script must be `/build/main.script`. Stella will automatically load and execute it when started with `-debug`.
 
 ### Flags Breakdown
 
@@ -154,9 +157,23 @@ Debug scripts automate Stella's debugger. They allow you to run a ROM for a spec
 
 ### Script File Location and Naming
 
-- Scripts must be named `<romname>.script` where `<romname>` matches the ROM filename without extension
-- Scripts must be placed in the directory specified by the `-userdir` flag
-- Example: ROM is `main.a26`, script must be `main.script` in the `-userdir` directory
+**ABSOLUTE REQUIREMENT:** Debug scripts follow a strict naming and location convention:
+
+- Script filename: `<romname>.script` where `<romname>` matches the ROM filename without extension
+- Script location: MUST be in the directory specified by the `-userdir` flag
+- Stella automatically loads `<romname>.script` from the `-userdir` when started with `-debug`
+- There is NO command-line flag to specify a script path - the naming convention is the ONLY way
+
+**Examples:**
+- ROM: `main.a26`, userdir: `/path/to/build` → Script: `/path/to/build/main.script`
+- ROM: `game.a26`, userdir: `.` → Script: `./game.script`
+- ROM: `/foo/bar.a26`, userdir: `/foo` → Script: `/foo/bar.script`
+
+**Common mistakes:**
+- ❌ Using `-debuggerScript` flag (does not exist)
+- ❌ Piping with `< script.txt` (Stella doesn't read from stdin)
+- ❌ Wrong script name like `test.script` when ROM is `main.a26`
+- ❌ Placing script in a different directory than `-userdir`
 
 ### Script Syntax
 

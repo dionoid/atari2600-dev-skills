@@ -153,29 +153,42 @@ Only bits D7-D4 are used. The value is a 4-bit signed offset:
 
 Strobe `HMOVE` (`$2A`) to apply all pending motion values simultaneously. Strobe `HMCLR` (`$2B`) to zero all motion registers.
 
-### The SetHorizPos Routine
+### The SetHorizPos Routine (REQUIRED for Smooth Movement)
 
-This is the canonical subroutine for positioning any object to any X coordinate (0-159). It combines coarse positioning (RESPx) and fine adjustment (HMxx) in a single call:
+**CRITICAL:** Any object that moves horizontally (spaceships, players, enemies, etc.) MUST use fine positioning for smooth movement. Coarse positioning (RESP0/RESP1 alone) moves in 15-pixel jumps, which looks extremely choppy. Fine positioning provides pixel-perfect control.
+
+This is the canonical subroutine for positioning any object to any X coordinate (0-159). It combines coarse positioning (RESPx) and fine adjustment (HMxx) using the divide-by-15 algorithm:
 
 ```asm
-; SetHorizPos: Position an object horizontally
-; A = desired X position (0-159)
-; X = object index (0=P0, 1=P1, 2=M0, 3=M1, 4=BL)
+;-------------------------------------------------------------------------------
+; SetHorizPos - Position sprite with fine positioning (pixel-perfect)
+; A = desired X coordinate (0-159)
+; X = sprite number (0=P0, 1=P1, 2=M0, 3=M1, 4=BL)
+;
+; Algorithm: Divide X position by 15 to get coarse position and remainder.
+; The coarse position is set by cycling through WSYNC + RESPx at the right time.
+; The remainder (0-14) is converted to fine motion offset (-8 to +7 pixels).
+;
 ; Must call sta HMCLR once before the first call.
-; Must call sta WSYNC / sta HMOVE once after all calls.
-SetHorizPos SUBROUTINE
-    sec
-    sta WSYNC
+; Must call sta WSYNC / sta HMOVE once after all calls to apply fine motion.
+;-------------------------------------------------------------------------------
+SetHorizPos:
+    sec                 ; Set carry for subtraction
+    sta WSYNC           ; Start on a fresh scanline
 .divideLoop:
-    sbc #15           ; 2 cycles per iteration
-    bcs .divideLoop   ; coarse position = beam position when loop exits
-    eor #7            ; adjust remainder into fine motion value
+    sbc #15             ; Subtract 15 (one coarse position unit)
+    bcs .divideLoop     ; Loop until negative (A now contains remainder - 15)
+    ; When loop exits, we've divided position by 15:
+    ; - Number of loop iterations = coarse position (set by RESP0,X timing)
+    ; - A register = remainder - 15 (range: -15 to -1)
+    eor #$07            ; Convert remainder to fine offset:
+                        ; -15 to -1 becomes the correct HMxx value pattern
+    asl                 ; Shift to upper nibble (HMxx uses bits D7-D4)
     asl
     asl
     asl
-    asl
-    sta HMP0,X        ; store fine motion (uses absolute addressing for timing)
-    sta RESP0,X       ; strobe coarse position
+    sta HMP0,X          ; Set fine position offset
+    sta RESP0,X         ; Strobe coarse position (timing from divideLoop)
     rts
 ```
 
@@ -224,6 +237,19 @@ When `HMOVE` is strobed, the TIA extends the horizontal blank by 8 colour clocks
 - Some games hide HMOVE bars by setting `COLUBK` to black for the leftmost pixels.
 
 ## 7. Common Positioning Patterns
+
+### CRITICAL: Always Use Fine Positioning for Moving Objects
+
+**RULE:** Any sprite that moves horizontally during gameplay (player ships, enemies, projectiles, etc.) MUST be positioned using `SetHorizPos` or equivalent fine positioning code. Using only coarse positioning (writing to RESP0/RESP1 directly without HMOVE) results in movement that jumps by 15 pixels at a time, which looks terrible.
+
+**Why this matters:**
+- Coarse positioning alone: Object jumps in 15-pixel increments (very choppy)
+- Fine positioning (SetHorizPos): Object moves smoothly pixel-by-pixel
+- Players immediately notice choppy movement and it makes games feel broken
+
+**Examples:**
+- ✅ Good: `lda shipX; ldx #0; jsr SetHorizPos` → smooth movement
+- ❌ Bad: `lda #shipX; sta RESP0` → jumps by 15 pixels
 
 ### Smooth Movement
 

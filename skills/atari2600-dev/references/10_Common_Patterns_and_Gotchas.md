@@ -173,6 +173,37 @@ Players, missiles, and the ball remain visible until explicitly disabled. Always
     sta ENABL
 ```
 
+### Choppy Movement from Coarse-Only Positioning
+
+**Problem:** Using only `RESP0`/`RESP1` without `HMOVE` causes sprites to jump by 15 pixels at a time instead of moving smoothly.
+
+**Why this happens:** The RESPx registers reset the sprite's horizontal position counter to the beam's current position, which advances in 15 color-clock increments. Without fine positioning (HMxx + HMOVE), you can only position at these coarse intervals.
+
+**Symptoms:**
+- Moving sprites appear to "jump" or "teleport" horizontally
+- Movement looks extremely choppy and unprofessional
+- Players immediately notice the jerky motion
+
+**Fix:** ALWAYS use the `SetHorizPos` routine (or equivalent) for any sprite that moves during gameplay. This combines coarse and fine positioning to achieve pixel-perfect (1 color clock) positioning:
+
+```asm
+; Correct — smooth pixel-level movement
+    lda shipX
+    ldx #0              ; P0
+    jsr SetHorizPos
+    sta WSYNC
+    sta HMOVE           ; Apply fine positioning
+```
+
+**Never do this for moving objects:**
+```asm
+; Wrong — jumps by 15 pixels
+    lda #shipX
+    sta RESP0
+```
+
+See [05_Sprites_Positioning_and_Motion.md] for the complete `SetHorizPos` routine.
+
 ### Wrong Include Paths
 
 dasm requires correct relative paths. If your project uses the standard structure (`src/`, `include/`, `build/`), includes should be:

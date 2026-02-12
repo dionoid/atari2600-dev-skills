@@ -238,6 +238,18 @@ The standard kernel pattern is:
 
 Always place `sta WSYNC` at the **top** of the loop. This ensures you start each iteration at a known cycle position (the beginning of HBLANK).
 
+### Kernel Timing: Only 76 Cycles Per Scanline
+
+**CRITICAL:** You have only **76 CPU cycles per scanline** in the kernel, including the `sta WSYNC` (3 cycles). If your kernel loop exceeds 76 cycles on any scanline, your frame will have the wrong scanline count (e.g., 279 instead of 262).
+
+**Solution: Keep kernels simple and do all calculations in VBLANK or OVERSCAN**
+
+- ✅ **In VBLANK/OVERSCAN:** Calculate positions, check collisions, update game state, determine which graphics to show
+- ✅ **In Kernel:** Only read pre-calculated values and write to TIA registers (GRP0/GRP1, COLUP0/COLUP1, PF0-PF2, etc.)
+- ❌ **Never in Kernel:** Math operations (`sbc`, `adc`), comparisons (`cmp`), complex branching, collision checks, position updates
+
+**Why this matters:** When validation fails with wrong scanline counts, the cause is almost always a kernel that does too much work per scanline. The fix is always to simplify the kernel and pre-calculate in VBLANK.
+
 ---
 
 ## 7. Overscan -- More Game Logic Time

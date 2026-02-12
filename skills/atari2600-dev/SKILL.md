@@ -7,6 +7,16 @@ description: "Expert 6502 assembly programming for Atari 2600 game development. 
 
 Expert system for creating 6502 assembly code for Atari 2600 games, compiling with dasm, and validating in headless Stella.
 
+## Important: Skill Directory Paths
+
+**This skill provides a base directory path when it loads.** All scripts are located relative to that base directory:
+- `<skill-base-dir>/scripts/create_project.py`
+- `<skill-base-dir>/scripts/build_and_run.py`
+
+**Usage Pattern:**
+1. When this skill loads, note the "Base directory for this skill" path from the system message
+2. Use that full path when calling the scripts, e.g.: `python3 /path/to/skill/scripts/build_and_run.py <source.asm>`
+
 ## Core Workflow
 
 ### 1. Understand the Request
@@ -30,8 +40,10 @@ Generate 6502 assembly following these constraints:
 
 ### 3. Build and Validate
 
+Use the build script:
+
 ```bash
-python3 scripts/build_and_run.py <source.asm>
+python3 <skill-base-dir>/scripts/build_and_run.py <source.asm>
 ```
 
 This script:
@@ -56,8 +68,10 @@ Rebuild after every change — the build-validate cycle catches timing bugs earl
 
 ## Creating a New Project
 
+Use the project creation script:
+
 ```bash
-python3 scripts/create_project.py my-game
+python3 <skill-base-dir>/scripts/create_project.py my-game
 ```
 
 Creates in the current directory:
@@ -72,7 +86,10 @@ my-game/
     └── main.script          # Default debug script for validation
 ```
 
-Build immediately to verify: `python3 scripts/build_and_run.py my-game/src/main.asm`
+Build immediately to verify:
+```bash
+python3 <skill-base-dir>/scripts/build_and_run.py my-game/src/main.asm
+```
 
 ## Debug Scripts
 

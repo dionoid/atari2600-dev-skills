@@ -4,5 +4,6 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-  "remoteUser": "dev"
+  "remoteUser": "dev",
+  "postCreateCommand": "mkdir -p .claude/skills && ln -sfn ../../skills/atari2600-dev .claude/skills/atari2600-dev"
 }

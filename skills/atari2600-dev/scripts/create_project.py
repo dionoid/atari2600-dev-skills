@@ -3,7 +3,7 @@
 Create a new Atari 2600 project with proper structure and includes.
 
 Usage:
-    python create_project.py <project-name>
+    python3 create_project.py <project-name>
 
 IMPORTANT: Run this script from your workspace root directory.
 The project will be created in the current directory.
@@ -11,20 +11,20 @@ The project will be created in the current directory.
 Creates:
     project-name/
     ├── src/
-    │   └── main.asm          # Main source file
+    │   └── main.asm          # Main source file with working template
     ├── include/
     │   ├── vcs.h             # TIA/RIOT register definitions
     │   ├── macro.h           # Helpful macros
     │   └── tv_modes.h        # TV mode constants
-    └── build/                # Output directory for ROMs
+    └── build/
+        └── main.script       # Debug script for headless Stella validation
 """
 
 import sys
-import os
 import shutil
 from pathlib import Path
 
-MAIN_ASM = """    
+MAIN_ASM = """\
     processor 6502
     include "../include/vcs.h"
     include "../include/macro.h"
@@ -70,17 +70,17 @@ MainLoop:
 ;---------------------------------------
     TIMER_SETUP VBLANK_LINES
     VERTICAL_SYNC
-    
-    ; Game logic goes here
+
+    ; Game logic goes here (input, movement, collision, scoring)
     ; You have time during VBLANK for calculations
 
     TIMER_WAIT
-    
+
     lda #%00000000
     sta VBLANK ; Turn off VBLANK
 
 ;---------------------------------------
-; Visible Screen
+; Visible Screen (192 scanlines)
 ;---------------------------------------
     ; Set background color
     lda frameCounter    ; Cycle through colors
@@ -116,6 +116,15 @@ MainLoop:
     .word Reset         ; BRK vector
 """
 
+DEFAULT_SCRIPT = """\
+frame #60
+print _scanEnd
+saveSnap
+ram
+exitRom
+"""
+
+
 def create_project(project_name):
     """Create a new Atari 2600 project directory structure."""
     project_path = Path(project_name)
@@ -140,17 +149,21 @@ def create_project(project_name):
         shutil.copy(assets_dir / "vcs.h", project_path / "include" / "vcs.h")
         shutil.copy(assets_dir / "macro.h", project_path / "include" / "macro.h")
         shutil.copy(assets_dir / "tv_modes.h", project_path / "include" / "tv_modes.h")
-        
+
         # Create main.asm file
         (project_path / "src" / "main.asm").write_text(MAIN_ASM)
 
+        # Create default debug script for headless Stella validation
+        (project_path / "build" / "main.script").write_text(DEFAULT_SCRIPT)
+
         # Create .gitignore
         gitignore = """# Build outputs
-build/
-*.a26
-*.bin
-*.lst
-*.sym
+build/*.a26
+build/*.bin
+build/*.lst
+build/*.sym
+build/*.png
+build/*.script.output.txt
 
 # Editor files
 .vscode/
@@ -160,19 +173,19 @@ build/
 """
         (project_path / ".gitignore").write_text(gitignore)
 
-        print(f"✅ Project '{project_name}' created successfully!")
+        print(f"Project '{project_name}' created successfully!")
         print(f"\nProject structure:")
         print(f"  {project_name}/")
         print(f"  ├── src/")
-        print(f"  │   └── main.asm          # Your code here")
+        print(f"  │   └── main.asm             # Your code here")
         print(f"  ├── include/")
-        print(f"  │   ├── vcs.h             # TIA/RIOT registers")
-        print(f"  │   └── macro.h           # Helpful macros")
-        print(f"  └── build/                # Build output")
+        print(f"  │   ├── vcs.h                # TIA/RIOT registers")
+        print(f"  │   ├── macro.h              # Helpful macros")
+        print(f"  │   └── tv_modes.h           # TV mode constants")
+        print(f"  └── build/")
+        print(f"      └── main.script          # Debug script for validation")
         print(f"\nNext steps:")
-        print(f"  cd {project_name}")
-        print(f"  dasm src/main.asm -f3 -obuild/game.a26")
-        print(f"  stella build/game.a26")
+        print(f"  python3 scripts/build_and_run.py {project_name}/src/main.asm")
 
         return True
 
@@ -180,9 +193,10 @@ build/
         print(f"Error creating project: {e}")
         return False
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python create_project.py <project-name>")
+        print("Usage: python3 create_project.py <project-name>")
         sys.exit(1)
 
     project_name = sys.argv[1]

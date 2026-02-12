@@ -6,92 +6,65 @@ Expert 6502 assembly programming skill for creating Atari 2600 games with Claude
 
 - **Complete 6502 Assembly Code Generation**: Create working Atari 2600 games from natural language descriptions
 - **Hardware Expertise**: Deep knowledge of TIA registers, RIOT timers, memory mapping, and NTSC/PAL timing
-- **Build Automation**: Python scripts for compiling with dasm and launching in Stella emulator
+- **Build Automation**: Python scripts for compiling with dasm and validating in headless Stella
 - **Project Templates**: Pre-configured project structure with vcs.h and macro.h includes
 - **Reference Documentation**: Complete guides for registers, timing, memory layout, and code patterns
 - **Cycle-Accurate Code**: Ensures proper 262 scanline NTSC timing and 76 cycles/scanline limits
 
-## Installation
+## Prerequisites
 
-### Prerequisites
+This project is designed to run inside a **dev container**. The dev container includes all required tools pre-installed:
 
-Install the required tools:
+- **dasm** assembler
+- Headless(!) **Stella** emulator (with logexec patch) running via `xvfb-run`
+- **Python 3** for build/validation scripts
 
-**macOS:**
-```bash
-brew install dasm
-brew install --cask stella
+For local dev containers you need [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or a compatible runtime like Rancher Desktop or Podman) installed and running. GitHub Codespaces runs in the cloud and doesn't require Docker locally.
+
+### Opening in a Dev Container
+
+**VS Code:**
+1. Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+2. Open this repository
+3. When prompted, click "Reopen in Container" (or use the command palette: `Dev Containers: Reopen in Container`)
+
+**PyCharm Professional:**
+1. Open the repository
+2. PyCharm will detect the `.devcontainer/devcontainer.json` and offer to open in a dev container
+3. Alternatively, go to **File > Remote Development > Dev Containers**
+
+**GitHub Codespaces:**
+1. Click the green "Code" button on the repository
+2. Select "Codespaces" and create a new codespace
+
+No manual installation of dasm, Stella, or other dependencies is required.
+
+## Skill Setup
+
+No setup needed, because the dev container automatically creates a symlink on first start via `postCreateCommand`:
+
+```
+.claude/skills/atari2600-dev -> ../../skills/atari2600-dev
 ```
 
-**Linux:**
-```bash
-sudo apt-get install dasm stella
-# or
-sudo pacman -S dasm stella
-```
-
-**Windows:**
-- Download dasm from [dasm-assembler.github.io](http://dasm-assembler.github.io/)
-- Download Stella from [stella-emu.github.io](https://stella-emu.github.io/)
-
-### Install the Skill
-
-**Option 1: Install from .skill file (Not yet available!)**
-
-```bash
-# Download the latest release
-curl -L https://github.com/dionoid/atari2600-dev-skills/releases/latest/download/atari2600-dev.skill -o atari2600-dev.skill
-
-# Install in Claude Code
-/plugin install atari2600-dev.skill
-```
-
-**Option 2: Project-local installation**
-
-Copy the skill to your project's `.claude/skills/` directory:
-
-```bash
-# Clone this repository
-git clone https://github.com/dionoid/atari2600-dev-skills.git
-
-# Copy to your project
-mkdir -p .claude/skills
-cp -r atari2600-dev-skills/skills/atari2600-dev .claude/skills/
-```
-
-**Option 3: Global installation**
-
-For use across all projects:
-
-```bash
-# Clone this repository
-git clone https://github.com/dionoid/atari2600-dev-skills.git
-
-# Install globally
-mkdir -p ~/.claude/skills
-cp -r atari2600-dev-skills/skills/atari2600-dev ~/.claude/skills/
-```
+Claude Code picks it up automatically from `.claude/skills/`.
 
 ## Quick Start
 
 After installation, the skill automatically activates when you mention Atari 2600 development:
 
 ```
-> Create a simple Atari 2600 game with a spaceship which has to avoid asteroids
-```
-
-```
-> Build a Pong clone for Atari 2600
-```
-
-```
 > Generate an Atari 2600 rainbow color demo
+```
+
+```
+> Create a simple Atari 2600 game with a spaceship at the bottom of the screen, which you can move left and right with your joystick. Asteroids come falling from above towards your spaceship the player should avoid them.
 ```
 
 The skill will:
 1. Generate complete 6502 assembly code
 2. Create proper project structure
-3. Provide build commands
+3. Build the ROM and validate scanline timing in headless Stella
 4. Ensure correct timings for NTSC (262 scanlines) or PAL (312 scanlines)
 
 ## Project Structure
@@ -107,26 +80,28 @@ your-game/
 │   ├── macro.h           # Helpful macros (CLEAN_START, VERTICAL_SYNC, etc.)
 │   └── tv_modes.h        # NTSC/PAL timing constants
 └── build/                # Output directory
-    ├── game.a26          # ROM file
-    ├── game.lst          # Assembly listing with cycle counts
-    └── game.sym          # Symbol table
+    ├── main.a26          # ROM file
+    ├── main.lst          # Assembly listing with cycle counts
+    ├── main.sym          # Symbol table
+    └── main.script       # Stella debug script for validation
 ```
 
 ## Scripts
 
 The skill includes automation scripts:
 
-**Build and Run:**
+**Build and Validate:**
 ```bash
-python skills/atari2600-dev/scripts/build_and_run.py src/main.asm
+python3 skills/atari2600-dev/scripts/build_and_run.py src/main.asm
 ```
 - Assembles with dasm
-- Generates .a26 ROM file
-- Launches in Stella automatically
+- Runs the ROM in headless Stella (via `xvfb-run`) with a debug script
+- Validates scanline count (expects 262 for NTSC)
+- Reports pass/fail with scanline count and RAM state
 
 **Create New Project:**
 ```bash
-python skills/atari2600-dev/scripts/create_project.py my-game
+python3 skills/atari2600-dev/scripts/create_project.py my-game
 ```
 - Creates complete project structure
 - Includes template code with proper frame structure
@@ -137,29 +112,24 @@ python skills/atari2600-dev/scripts/create_project.py my-game
 The skill includes comprehensive reference documentation in the [references/](skills/atari2600-dev/references/) directory:
 
 ### Core Topics
-- **01 - Atari 2600 Fundamentals**: Architecture overview, 6507 CPU, TIA/RIOT basics, NTSC vs PAL timing
-- **02 - Memory & Hardware Maps**: Complete memory map, TIA/RIOT register addresses, zero-page conventions
-- **03 - Toolchain & Development Setup**: dasm assembler usage, project layout, Stella debugger, macros
-- **04 - Frame Structure & Timing**: Frame sections (VSYNC/VBLANK/kernel/overscan), cycle counting, timing
+- **01 - Architecture and Memory Map**: 6507 CPU, TIA, RIOT, memory map, register addresses
+- **02 - Frame Structure and Timing**: VSYNC/VBLANK/kernel/overscan, cycle budgets, NTSC vs PAL
+- **03 - Toolchain and Stella Debugger**: dasm assembler, Stella debugger commands, .script format
 
 ### Graphics & Display
-- **05 - Graphics Basics**: Color system, luminance values, basic TIA graphics concepts
-- **06 - Playfield Graphics**: PF0/PF1/PF2 registers, reflection, score mode, asymmetric playfields
-- **07 - Players, Missiles & Ball**: Sprite objects (P0/P1/M0/M1/BL), NUSIZ, graphics registers
-- **08 - Positioning & Motion**: RESP0/1, horizontal motion (HMP0/1, HMOVE), fine positioning
+- **04 - Graphics and Playfield**: Colour system, PF registers, playfield timing, asymmetric PF
+- **05 - Sprites, Positioning and Motion**: Players, missiles, ball, NUSIZ, SetHorizPos, HMOVE, VDEL
 
 ### Input & Game Logic
-- **09 - Input Handling**: Reading joysticks (SWCHA), fire buttons (INPT4/5), console switches
-- **10 - Collision Detection**: Collision registers (CXM0P, CXP0FB, etc.), CXCLR, collision patterns
-- **11 - Sound & Music**: Audio channels, AUDC/AUDF/AUDV registers, waveforms, music patterns
-- **12 - Timers & Game Logic**: RIOT timer (TIM64T), INTIM, game state management
+- **06 - Input and Collision**: Joysticks, fire buttons, console switches, collision registers
+- **07 - Sound and Music**: AUDC/AUDF/AUDV, distortion types, frequency tables, music
+- **08 - Game Logic and Timers**: RIOT timer, frame counters, state machines, RNG, BCD scoring
 
 ### Advanced Topics
-- **13 - Advanced Graphics Techniques**: Multi-sprite kernels, flicker, 2-line kernels, 6-digit scores
-- **14 - Cartridge & ROM Techniques**: Bank switching (F8/F6/F4), ROM layout, cartridge formats
-- **15 - Common Patterns & Gotchas**: Best practices, common mistakes, optimization tips
-- **16 - Complete Examples**: Full working code samples demonstrating various techniques
-- **17 - Reference & Cheat Sheets**: Quick reference tables for registers, cycles, and common values
+- **09 - Advanced Techniques**: 48-pixel sprites, score displays, multiplexing, bank switching
+- **10 - Common Patterns and Gotchas**: Kernel stability, common bugs, debugging workflow
+- **11 - Complete Examples**: Full working programs: rainbow, sprite, maze, sound demo
+- **12 - Reference and Cheat Sheets**: Register tables, 6502 instructions, colour chart, memory map
 
 ## Contributing
 
@@ -174,8 +144,6 @@ Contributions are welcome! Please:
 ## Credits
 
 Created for use with [Claude Code](https://claude.com/claude-code) by Anthropic.
-
-Skill framework based on [Agent Skills standard](https://agentskills.io/).
 
 ## Version History
 

@@ -1,20 +1,20 @@
-# give the game a second to start
+; give the game a second to start
 frame #60
 
-# now press joystick
+; now press joystick
 joy0Fire 1
 joy0Fire 0
 
-# wait a second
+; wait a second
 frame #60
 
-# pring last frame's number of scanlines
+; pring last frame's number of scanlines
 print _scanEnd
 
-# save snapshot
+; save snapshot
 saveSnap
 
-# print RAM bytes
+; print RAM bytes
 ram
 
 ; ... and finally exit ROM

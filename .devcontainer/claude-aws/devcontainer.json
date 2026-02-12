@@ -8,5 +8,6 @@
   "mounts": [
     "source=${localEnv:HOME}/.aws,target=/home/dev/.aws,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude,target=/home/dev/.claude,type=bind,consistency=cached"
-  ]
+  ],
+  "postCreateCommand": "mkdir -p .claude/skills && ln -sfn ../../skills/atari2600-dev .claude/skills/atari2600-dev"
 }

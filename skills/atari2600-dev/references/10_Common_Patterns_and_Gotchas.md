@@ -239,8 +239,6 @@ Run the ROM in headless Stella with a `.script` file:
 ```
 frame #60
 print _scanEnd
-saveSnap
-ram
 exitRom
 ```
 

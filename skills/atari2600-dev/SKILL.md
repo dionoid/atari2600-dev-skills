@@ -85,8 +85,6 @@ One command per line. Comments with `//`. Example:
 ```
 frame #60
 print _scanEnd
-saveSnap
-ram
 exitRom
 ```
 
@@ -96,8 +94,6 @@ exitRom
 |---|---|
 | `frame #N` | Advance N frames |
 | `print <expr>` | Print a value (register, pseudo-register, or address) |
-| `saveSnap` | Save a `.png` screenshot |
-| `ram` | Dump all RAM contents ($80-$FF) |
 | `exitRom` | Quit Stella |
 
 ### Pseudo-Registers

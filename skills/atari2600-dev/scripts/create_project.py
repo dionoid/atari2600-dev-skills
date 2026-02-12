@@ -68,8 +68,8 @@ MainLoop:
 ;---------------------------------------
 ; Vertical Sync and Blank
 ;---------------------------------------
-    TIMER_SETUP VBLANK_LINES
     VERTICAL_SYNC
+    TIMER_SETUP VBLANK_LINES
 
     ; Game logic goes here (input, movement, collision, scoring)
     ; You have time during VBLANK for calculations
@@ -119,8 +119,6 @@ MainLoop:
 DEFAULT_SCRIPT = """\
 frame #60
 print _scanEnd
-saveSnap
-ram
 exitRom
 """
 

@@ -58,7 +58,7 @@ After installation, the skill automatically activates when you mention Atari 260
 ```
 
 ```
-> Create a simple Atari 2600 game with a spaceship at the bottom of the screen, which you can move left and right with your joystick. Asteroids come falling from above towards your spaceship the player should avoid them.
+> Create a simple Atari 2600 game with a spaceship at the bottom of the screen, which you can move left and right with your joystick. Asteroids come falling from above towards your spaceship and should be avoided by the player.
 ```
 
 The skill will:

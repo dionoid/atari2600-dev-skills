@@ -445,8 +445,6 @@ python3 build_and_run.py <source.asm> [output.a26]
 ```
 frame #60
 print _scanEnd
-saveSnap
-ram
 exitRom
 ```
 

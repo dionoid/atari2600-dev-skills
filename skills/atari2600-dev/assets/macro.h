@@ -86,7 +86,7 @@ VERSION_MACRO         = 111
 ; OUT: A = 0
 
              MAC VERTICAL_SYNC
-                lda #%1110          ; each '1' bits generate a VSYNC ON line (bits 1..3)
+                lda #%110           ; each '1' bits generate a VSYNC ON line (bits 1..3)
 .VSLP1          sta WSYNC           ; 1st '0' bit resets Vsync, 2nd '0' bit exit loop
                 sta VSYNC
                 lsr

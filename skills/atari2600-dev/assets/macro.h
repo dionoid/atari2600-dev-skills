@@ -79,19 +79,20 @@ VERSION_MACRO         = 111
 
 ;-------------------------------------------------------------------------------
 ; VERTICAL_SYNC
-; revised version by Edwin Blink -- saves bytes!
-; Inserts the code required for a proper 3 scanline vertical sync sequence
-; Note: Alters the accumulator
-
 ; OUT: A = 0
 
-             MAC VERTICAL_SYNC
-                lda #%110           ; each '1' bits generate a VSYNC ON line (bits 1..3)
-.VSLP1          sta WSYNC           ; 1st '0' bit resets Vsync, 2nd '0' bit exit loop
-                sta VSYNC
-                lsr
-                bne .VSLP1          ; branch until VSYNC has been reset
-             ENDM
+            MAC VERTICAL_SYNC
+            ; turn VSYNC on
+            lda #2
+            sta VSYNC
+            ; hold it on for 3 scanlines
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            ; turn VSYNC off
+            lda #0
+            sta VSYNC
+            ENDM
 
 ;-------------------------------------------------------------------------------
 ; CLEAN_START

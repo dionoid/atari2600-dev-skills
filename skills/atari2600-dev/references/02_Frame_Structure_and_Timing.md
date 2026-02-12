@@ -391,7 +391,7 @@ Overscan: 30 lines (counted by TIMER_SETUP 30 + TIMER_WAIT)
 Total:  262 lines
 ```
 
-Note that `tv_modes.h` defines `VBLANK_LINES = 40` for NTSC, which includes the 3 VSYNC lines in the count. The `TIMER_SETUP` macro is called with this value, and the `VERTICAL_SYNC` macro consumes 3 of those lines. The remaining 37 are the actual VBLANK scanlines timed by the RIOT timer.
+Note that `tv_modes.h` defines `VBLANK_LINES = 37` for NTSC, and `VBLANK_LINES = 45` for PAL.
 
 ---
 

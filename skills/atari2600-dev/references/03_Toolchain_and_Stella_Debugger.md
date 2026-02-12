@@ -427,11 +427,11 @@ The development environment includes two Python scripts that automate the build 
 
 ### build_and_run.py
 
-**Location:** `skills/atari2600-dev/scripts/build_and_run.py`
+**Location:** `scripts/build_and_run.py` (in the skill directory)
 
 **Usage:**
-```
-python3 build_and_run.py <source.asm> [output.a26]
+```bash
+python3 scripts/build_and_run.py <source.asm> [output.a26]
 ```
 
 **What it does:**
@@ -455,11 +455,11 @@ exitRom
 
 ### create_project.py
 
-**Location:** `skills/atari2600-dev/scripts/create_project.py`
+**Location:** `scripts/create_project.py` (in the skill directory)
 
 **Usage:**
-```
-python3 create_project.py <project-name>
+```bash
+python3 scripts/create_project.py <project-name>
 ```
 
 **What it does:**
@@ -481,6 +481,6 @@ python3 create_project.py <project-name>
 4. Creates a default `main.script` in the build directory for headless validation
 
 **After creating a project, build and test it with:**
-```
-python3 build_and_run.py project-name/src/main.asm
+```bash
+python3 scripts/build_and_run.py project-name/src/main.asm
 ```

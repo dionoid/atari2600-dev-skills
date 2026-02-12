@@ -38,6 +38,16 @@ RUN curl -fsSL \
 # Headless Stella disable audio
 ENV SDL_AUDIODRIVER=dummy
 
+# ---- AWS CLI v2 ----
+RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o /tmp/awscliv2.zip \
+  && unzip -q /tmp/awscliv2.zip -d /tmp \
+  && /tmp/aws/install \
+  && rm -rf /tmp/aws /tmp/awscliv2.zip
+
+# Nice defaults for automation
+ENV AWS_PAGER=""
+ENV AWS_SDK_LOAD_CONFIG=1
+
 # Create non-root dev user
 RUN useradd -m -s /bin/bash dev \
   && usermod -aG sudo dev \

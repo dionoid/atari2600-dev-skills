@@ -1,0 +1,12 @@
+{
+  "name": "atari2600-dev-skills",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "dev",
+  "mounts": [
+    "source=${localEnv:HOME}/.aws,target=/home/dev/.aws,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude,target=/home/dev/.claude,type=bind,consistency=cached"
+  ]
+}

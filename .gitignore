@@ -27,5 +27,4 @@ dist/
 *.tmp
 *.bak
 
-.devcontainer/personal/**
 !example-roms/*.bin

@@ -78,36 +78,18 @@ def assemble(source_path, output_file):
     return True
 
 
-def find_or_create_script(rom_path):
-    """Find an existing .script file or create a default one.
-
-    Stella loads debug scripts named <romname>.script from the -userdir directory.
-    Returns the path to the script file.
-    """
-    script_name = rom_path.stem + ".script"
-    script_path = rom_path.parent / script_name
-
-    if script_path.exists():
-        print(f"Using debug script: {script_path}")
-        return script_path
-
-    print(f"No .script file found, creating default: {script_path}")
-    script_path.write_text(DEFAULT_SCRIPT)
-    return script_path
-
-
 def run_headless_stella(rom_path, script_path):
     """Run ROM in headless Stella with debug script. Returns the output text or None."""
     userdir = rom_path.parent.resolve()
 
     stella_cmd = [
         "xvfb-run", "-a",
-        "-s", "-screen 0 1280x720x24",
         STELLA_PATH,
-        "-userdir", str(userdir),
         "-debug",
-        str(rom_path.resolve()),
         "-dbg.logexec", "1",
+        "-dbg.script", str(script_path.resolve()),
+        "-userdir", str(userdir),
+        str(rom_path.resolve()),
     ]
 
     print("Running headless Stella...")
@@ -120,7 +102,7 @@ def run_headless_stella(rom_path, script_path):
         print("ERROR: xvfb-run or stella not found")
         return None
 
-    output_file = rom_path.parent / (rom_path.stem + ".script.output.txt")
+    output_file = rom_path.parent / (script_path.name + ".output.txt")
     if output_file.exists():
         return output_file.read_text()
 
@@ -199,8 +181,11 @@ def build_and_run(source_file, output_file=None):
     if not assemble(source_path, output_file):
         return False
 
-    # Step 2: Find or create debug script
-    script_path = find_or_create_script(output_file)
+    # Step 2: Create debug script if it doesn't exist
+    script_path = output_file.parent / "check_scanlines.script"
+    if not script_path.exists():
+        print(f"Creating default script: {script_path}")
+        script_path.write_text(DEFAULT_SCRIPT)
 
     # Step 3: Run headless Stella
     output_text = run_headless_stella(output_file, script_path)

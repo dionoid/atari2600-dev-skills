@@ -83,7 +83,7 @@ your-game/
     ├── main.a26          # ROM file
     ├── main.lst          # Assembly listing with cycle counts
     ├── main.sym          # Symbol table
-    └── main.script       # Stella debug script for validation
+    └── (debug scripts created by build_and_run.py)
 ```
 
 ## Scripts
@@ -95,13 +95,13 @@ The skill includes automation scripts:
 python3 skills/atari2600-dev/scripts/build_and_run.py src/main.asm
 ```
 - Assembles with dasm (`-f3` format)
-- Creates or uses a debug script named `<romname>.script` in the build directory
+- Creates a default debug script if none exists in the build directory
 - Runs the ROM in headless Stella with the command:
   ```bash
-  xvfb-run -a stella -userdir <build-dir> -debug <rom>.a26 -dbg.logexec 1
+  xvfb-run -a stella -debug -dbg.logexec 1 -dbg.script <script-path> -userdir <build-dir> <rom>.a26
   ```
 - **IMPORTANT:** The `-dbg.logexec 1` flag is always required for automated testing
-- Validates scanline count from `<romname>.script.output.txt` (expects 262 for NTSC)
+- Validates scanline count from the script output file (expects 262 for NTSC)
 - Reports pass/fail with scanline count and RAM state
 
 **Create New Project:**

@@ -4,14 +4,12 @@
 **Correct command to run Stella with debug scripts:**
 
 ```bash
-cd example-roms
-
-xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir ./example-roms -debug ./example-roms/amoeba-jump.bin -dbg.logexec 1
+xvfb-run -a stella -debug -dbg.logexec 1 -dbg.script ./example-roms/debug.script -userdir ./example-roms ./example-roms/amoeba-jump.bin
 ```
 
 **Important notes:**
 - **ALWAYS** include `-dbg.logexec 1` for automated testing (writes output to file)
-- Debug script must be named `amoeba-jump.script` and placed in the `-userdir` directory
-- Stella automatically loads the script based on ROM name
-- Output is written to `amoeba-jump.script.output.txt`
+- Use `-dbg.script <path>` to specify the debug script file to load
+- Output is written to `debug.script.output.txt`
+- Use `-userdir <dir>` to control where Stella saves output files (screenshots from `saveSnap`, etc.)
 - Do NOT use `-exitlauncher` or pipe scripts - this is not how Stella works

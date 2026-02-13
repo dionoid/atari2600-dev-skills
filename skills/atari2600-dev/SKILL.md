@@ -48,13 +48,13 @@ python3 <skill-base-dir>/scripts/build_and_run.py <source.asm>
 
 This script:
 1. **Assembles** with dasm (`-f3` format, generates `.lst` and `.sym` files)
-2. **Creates or uses** a debug script named `<romname>.script` in the build directory
+2. **Creates** a default scanline-check debug script if none exists in the build directory
 3. **Runs** the ROM in headless Stella with the command:
    ```bash
-   xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir <build-dir> -debug <rom>.a26 -dbg.logexec 1
+   xvfb-run -a stella -debug -dbg.logexec 1 -dbg.script <script-path> -userdir <build-dir> <rom>.a26
    ```
    **IMPORTANT:** The `-dbg.logexec 1` flag is ALWAYS required for automated validation
-4. **Validates** by reading `_scanEnd` from `<romname>.script.output.txt` — expects 262 (NTSC) or 312 (PAL)
+4. **Validates** by reading `_scanEnd` from the script output file — expects 262 (NTSC) or 312 (PAL)
 5. **Reports** pass/fail with scanline count, RAM state, and any saved snapshots
 
 Output tells you exactly what happened:
@@ -63,10 +63,10 @@ Output tells you exactly what happened:
 - `Build and validation PASSED` / `validation FAILED` — overall result
 
 **How Stella Debug Scripts Work:**
-- Script must be named `<romname>.script` (e.g., `main.script` for `main.a26`)
-- Script must be in the directory specified by `-userdir`
-- Stella automatically loads and executes the script when started with `-debug`
-- Output is written to `<romname>.script.output.txt` when `-dbg.logexec 1` is used
+- Use `-dbg.script <path>` to specify the debug script file to load
+- `build_and_run.py` creates a default script automatically if none exists
+- Stella automatically executes the script when started with `-debug`
+- Output is written to `<scriptname>.output.txt` when `-dbg.logexec 1` is used
 
 ### 4. Iterate
 
@@ -94,7 +94,7 @@ my-game/
 │   ├── macro.h              # CLEAN_START, VERTICAL_SYNC, TIMER_SETUP, etc.
 │   └── tv_modes.h           # NTSC/PAL constants (VBLANK_LINES, KERNEL_LINES, etc.)
 └── build/
-    └── main.script          # Default debug script for validation
+    └── (debug scripts created by build_and_run.py)
 ```
 
 Build immediately to verify:
@@ -105,11 +105,11 @@ python3 <skill-base-dir>/scripts/build_and_run.py my-game/src/main.asm
 ## Debug Scripts
 
 **How Debug Scripts Work:**
-- Stella automatically loads `<romname>.script` from the `-userdir` directory
+- Use `-dbg.script <path>` to tell Stella which debug script file to load
 - The script runs debugger commands automatically when Stella starts with `-debug`
 - If no `.script` file exists, `build_and_run.py` creates a default one
 - **DO NOT** use `-exitlauncher` (not a valid Stella flag)
-- **DO NOT** pipe scripts with `< script.txt` (Stella uses naming convention, not stdin)
+- **DO NOT** pipe scripts with `< script.txt` (Stella doesn't read from stdin)
 
 ### Script Format
 

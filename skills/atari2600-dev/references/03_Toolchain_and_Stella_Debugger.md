@@ -103,41 +103,44 @@ Stella is the standard Atari 2600 emulator and includes a built-in debugger. For
 **This is the ONLY correct way to run Stella with debug scripts for automated testing:**
 
 ```bash
-xvfb-run -a -s "-screen 0 1280x720x24" stella -userdir <dir> -debug <rom>.a26 -dbg.logexec 1
+xvfb-run -a stella -debug -dbg.logexec 1 -dbg.script <script-path> -userdir <output-dir> <rom>.a26
 ```
 
 **CRITICAL REQUIREMENTS:**
-- **Script naming:** Debug scripts MUST be named `<romname>.script` (e.g., `main.script` for `main.a26`)
-- **Script location:** The script MUST be placed in the directory specified by `-userdir`
+- **Script path:** Use `-dbg.script <path>` to specify the debug script file to load
+- **Output directory:** Use `-userdir <dir>` to control where Stella saves output files (screenshots from `saveSnap`, etc.). Without this, screenshots may not be saved.
 - **Do NOT** use `-exitlauncher` (not a valid flag in headless mode)
-- **Do NOT** pipe scripts with `< script.txt` (Stella uses naming convention, not stdin)
+- **Do NOT** pipe scripts with `< script.txt` (Stella doesn't read from stdin)
 - **ALWAYS** use `-dbg.logexec 1` (required for capturing output to file)
 
-**Example:** If your ROM is `/build/main.a26` and you use `-userdir /build`, then your script must be `/build/main.script`. Stella will automatically load and execute it when started with `-debug`.
+**Example:** If your ROM is `/build/main.a26` and your script is `/build/my_debug.script`:
+```bash
+xvfb-run -a stella -debug -dbg.logexec 1 -dbg.script /build/my_debug.script -userdir /build /build/main.a26
+```
 
 ### Flags Breakdown
 
 | Part | Purpose | Required |
 |---|---|---|
 | `xvfb-run -a` | Run under a virtual framebuffer; `-a` auto-selects a free display number | Yes |
-| `-s "-screen 0 1280x720x24"` | Configure virtual screen resolution and color depth | Yes |
 | `stella` | The Stella emulator binary | Yes |
-| `-userdir <dir>` | Directory where Stella looks for `<romname>.script` and writes output files | Yes |
 | `-debug` | Start Stella in debugger mode immediately | Yes |
-| `<rom>.a26` | Path to the ROM file to load | Yes |
 | `-dbg.logexec 1` | Enable script output logging -- writes debugger output to a file instead of only displaying in the UI | **ALWAYS REQUIRED** |
+| `-dbg.script <path>` | Path to the debug script file to load and execute | Yes |
+| `-userdir <dir>` | Directory where Stella saves output files (screenshots from `saveSnap`, etc.) | Recommended |
+| `<rom>.a26` | Path to the ROM file to load | Yes |
 
-### How -userdir Works
+### How -dbg.script Works
 
-The `-userdir` flag tells Stella which directory to use as its user configuration directory. When Stella loads a ROM in debug mode, it looks for a file named `<romname>.script` in the `-userdir` directory. For example, if you load `main.a26` with `-userdir /path/to/build`, Stella will look for `/path/to/build/main.script` and automatically execute the commands in that file.
+The `-dbg.script <path>` flag tells Stella which debug script file to load and execute when starting in debug mode. You specify the full path to the script file directly. For example, if your script is at `/path/to/build/my_debug.script`, you pass `-dbg.script /path/to/build/my_debug.script` and Stella will automatically execute the commands in that file.
 
 ### How -dbg.logexec 1 Works
 
-When `-dbg.logexec 1` is enabled, Stella writes all debugger output (command echoes and results) to a file named `<romname>.script.output.txt` in the same directory as the ROM. This is what makes headless validation possible -- the build script can parse this output file to check scanline counts, RAM state, and other validation criteria.
+When `-dbg.logexec 1` is enabled, Stella writes all debugger output (command echoes and results) to a file named `<scriptname>.output.txt` (e.g., `my_debug.script.output.txt`) in the `-userdir` directory. This is what makes headless validation possible -- the build script can parse this output file to check scanline counts, RAM state, and other validation criteria.
 
 ### Example Output Format
 
-After running a debug script, the output file (`main.script.output.txt`) contains a log of every command executed and its result. Lines beginning with `> ` are echoed commands. Comment lines (starting with `;`) produce "No such command" errors that are safely ignored:
+After running a debug script, the output file (e.g., `my_debug.script.output.txt`) contains a log of every command executed and its result. Lines beginning with `> ` are echoed commands. Comment lines (starting with `;`) produce "No such command" errors that are safely ignored:
 
 ```
 > frame #60
@@ -157,23 +160,18 @@ Debug scripts automate Stella's debugger. They allow you to run a ROM for a spec
 
 ### Script File Location and Naming
 
-**ABSOLUTE REQUIREMENT:** Debug scripts follow a strict naming and location convention:
+Debug scripts are specified directly via the `-dbg.script` flag:
 
-- Script filename: `<romname>.script` where `<romname>` matches the ROM filename without extension
-- Script location: MUST be in the directory specified by the `-userdir` flag
-- Stella automatically loads `<romname>.script` from the `-userdir` when started with `-debug`
-- There is NO command-line flag to specify a script path - the naming convention is the ONLY way
+- Use `-dbg.script <path>` to tell Stella which script file to load
+- The script file can have any name and be in any location
+- `build_and_run.py` creates a default script automatically if none exists
+- Stella executes the script automatically when started with `-debug`
 
-**Examples:**
-- ROM: `main.a26`, userdir: `/path/to/build` → Script: `/path/to/build/main.script`
-- ROM: `game.a26`, userdir: `.` → Script: `./game.script`
-- ROM: `/foo/bar.a26`, userdir: `/foo` → Script: `/foo/bar.script`
 
 **Common mistakes:**
-- ❌ Using `-debuggerScript` flag (does not exist)
 - ❌ Piping with `< script.txt` (Stella doesn't read from stdin)
-- ❌ Wrong script name like `test.script` when ROM is `main.a26`
-- ❌ Placing script in a different directory than `-userdir`
+- ❌ Forgetting the `-dbg.script` flag (Stella won't load any script automatically)
+- ❌ Using `-exitlauncher` (not a valid Stella flag)
 
 ### Script Syntax
 
@@ -461,7 +459,7 @@ python3 scripts/build_and_run.py <source.asm> [output.a26]
 
 **What it does:**
 1. Assembles the source file with dasm using standard flags (`-f3 -v0 -l -s`)
-2. Looks for an existing `<romname>.script` file next to the output ROM, or creates a default one
+2. Creates a default debug script if none exists in the build directory
 3. Runs the ROM in headless Stella with `xvfb-run` and `-dbg.logexec 1`
 4. Parses the script output file to extract the `_scanEnd` value and RAM dump
 5. Reports whether validation passed (correct scanline count) or failed
@@ -498,12 +496,10 @@ python3 scripts/create_project.py <project-name>
    │   ├── macro.h           # Standard macros
    │   └── tv_modes.h        # TV mode constants and colors
    ├── build/
-   │   └── main.script       # Default debug script for validation
    └── .gitignore            # Ignores build artifacts
    ```
 2. Copies the standard include files (vcs.h, macro.h, tv_modes.h) from the assets directory
 3. Generates a `main.asm` template with a complete, working frame structure (VSYNC, VBLANK, kernel, overscan) that assembles and validates cleanly out of the box
-4. Creates a default `main.script` in the build directory for headless validation
 
 **After creating a project, build and test it with:**
 ```bash

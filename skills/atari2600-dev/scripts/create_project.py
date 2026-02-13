@@ -17,7 +17,6 @@ Creates:
     │   ├── macro.h           # Helpful macros
     │   └── tv_modes.h        # TV mode constants
     └── build/
-        └── main.script       # Debug script for headless Stella validation
 """
 
 import sys
@@ -116,13 +115,6 @@ MainLoop:
     .word Reset         ; BRK vector
 """
 
-DEFAULT_SCRIPT = """\
-frame #60
-print _scanEnd
-exitRom
-"""
-
-
 def create_project(project_name):
     """Create a new Atari 2600 project directory structure."""
     project_path = Path(project_name)
@@ -151,9 +143,6 @@ def create_project(project_name):
         # Create main.asm file
         (project_path / "src" / "main.asm").write_text(MAIN_ASM)
 
-        # Create default debug script for headless Stella validation
-        (project_path / "build" / "main.script").write_text(DEFAULT_SCRIPT)
-
         # Create .gitignore
         gitignore = """# Build outputs
 build/*.a26
@@ -181,7 +170,6 @@ build/*.script.output.txt
         print(f"  │   ├── macro.h              # Helpful macros")
         print(f"  │   └── tv_modes.h           # TV mode constants")
         print(f"  └── build/")
-        print(f"      └── main.script          # Debug script for validation")
         print(f"\nNext steps:")
         print(f"  python3 scripts/build_and_run.py {project_name}/src/main.asm")
 
